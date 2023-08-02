@@ -1,0 +1,50 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+.point-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: none;
+}
+
+.point {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 1.8s ease infinite;
+}
+
+.info-point {
+    width: 28px;
+    cursor: pointer;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

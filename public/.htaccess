@@ -1,0 +1,32 @@
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ / [L,R=301]
+
+Header set Cache-Control "max-age=604800, public"
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml application/xml application/xhtml+xml text/css application/javascript application/x-javascript application/json application/octet-stream
+
+    <IfModule mod_mime.c>
+        AddType application/octet-stream .glb
+        AddType application/wasm .wasm
+        AddType image/svg+xml .svg .svgz
+        AddType text/css .css
+        AddType text/javascript .js
+        AddType text/xml .xml
+        AddType image/x-icon .ico
+        AddType image/png .png
+        AddType image/jpeg .jpg .jpeg
+        AddType image/webp .webp
+        AddType image/gif .gif
+        AddType text/plain .txt
+    </IfModule>
+
+    <IfModule mod_filter.c>
+        SetEnvIfNoCase Request_URI "\.(glb|wasm)$" no-gzip
+        SetEnvIfNoCase Request_URI "\.(svg|svgz|css|js|xml|ico|png|jpe?g|webp|gif|txt)$" no-gzip
+    </IfModule>
+</IfModule>

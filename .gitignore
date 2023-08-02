@@ -1,0 +1,7 @@
+.idea
+
+node_modules
+dist
+
+resources/blender
+resources/*.zip
