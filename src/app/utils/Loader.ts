@@ -19,9 +19,15 @@ export class Loader {
 
 	public static loadVideoTexture(video: HTMLVideoElement): VideoTexture {
 		const texture = new THREE.VideoTexture(video);
+
+		texture.repeat.set(1, 1);
+		texture.offset.set(0, 0);
+		texture.center.set(0.5, 0.5);
 		texture.flipY = false;
-		texture.minFilter = THREE.NearestFilter;
-		texture.magFilter = THREE.NearestFilter;
+		texture.wrapS = THREE.ClampToEdgeWrapping;
+		texture.wrapT = THREE.ClampToEdgeWrapping;
+		texture.minFilter = THREE.LinearFilter;
+		texture.magFilter = THREE.LinearFilter;
 
 		return texture;
 	}

@@ -34,6 +34,8 @@ export class Experience {
 		this.renderer = new WebGLRenderer({ antialias: true });
 		this.renderer.setSize(this.sizes.w, this.sizes.h);
 
+		this.renderer.domElement.style.background = "#000";
+
 		this.cameraManager = new CameraManager(this.sizes, this.renderer.domElement);
 		this.modelManager = new ModelManager();
 
@@ -53,6 +55,11 @@ export class Experience {
 		this.controls = this.cameraManager.getControls();
 
 		this.modelManager.loadModels(this.scene).then(() => {
+			const loader = document.getElementById("loader");
+			if (loader) {
+				document.body.removeChild(loader);
+			}
+
 			this.scene.add(this.camera);
 			document.body.appendChild(this.renderer.domElement);
 
@@ -60,6 +67,10 @@ export class Experience {
 
 			this.renderer.setAnimationLoop(() => this.animate());
 		});
+	}
+
+	public getRendererElement(): HTMLElement {
+		return this.renderer.domElement;
 	}
 
 	public getCameraManager(): CameraManager {

@@ -35,36 +35,38 @@ export class CameraManager {
 		return this.controls;
 	}
 
-	public moveToGameBox(viewPoint: Mesh, infoPoint: Mesh, onMoved: Function): void {
-		this.controls.removeEventListener("change", this.onMouseChangeBound);
-		this.switchToDefaultControls();
+	public moveToGameBox(viewPoint: Mesh, infoPoint: Mesh, onMoved: Function, duration: number = 2000): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.controls.removeEventListener("change", this.onMouseChangeBound);
+			this.switchToDefaultControls();
 
-		const viewPointPosition = viewPoint.position.clone();
-		const boxPosition = infoPoint.position.clone();
+			const viewPointPosition = viewPoint.position.clone();
+			const boxPosition = infoPoint.position.clone();
 
-		const offsetBackward = new THREE.Vector3(-.2, .3, 0);
+			const offsetBackward = new THREE.Vector3(-.2, .3, 0);
 
-		const targetPosition = viewPointPosition.clone().add(offsetBackward);
-		const lookAtPosition = new THREE.Vector3(boxPosition.x, boxPosition.y, boxPosition.z);
+			const targetPosition = viewPointPosition.clone().add(offsetBackward);
+			const lookAtPosition = new THREE.Vector3(boxPosition.x, boxPosition.y, boxPosition.z);
 
-		const duration = 2000;
+			const tweenPosition = new TWEEN.Tween(this.camera.position)
+				.to(targetPosition, duration)
+				.easing(TWEEN.Easing.Quadratic.InOut);
 
-		const tweenPosition = new TWEEN.Tween(this.camera.position)
-			.to(targetPosition, duration)
-			.easing(TWEEN.Easing.Quadratic.InOut);
+			const tweenLookAt = new TWEEN.Tween(this.controls.target)
+				.to(lookAtPosition, duration)
+				.easing(TWEEN.Easing.Quadratic.InOut);
 
-		const tweenLookAt = new TWEEN.Tween(this.controls.target)
-			.to(lookAtPosition, duration)
-			.easing(TWEEN.Easing.Quadratic.InOut);
+			tweenPosition.start();
+			tweenLookAt.start();
 
-		tweenPosition.start();
-		tweenLookAt.start();
+			tweenPosition.onComplete(() => {
+				if (onMoved) {
+					onMoved();
+					this.switchToViewBoxControls();
+				}
 
-		tweenPosition.onComplete(() => {
-			if (onMoved) {
-				onMoved();
-				this.switchToViewBoxControls();
-			}
+				resolve();
+			});
 		});
 	}
 

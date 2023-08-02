@@ -80,7 +80,7 @@ export class GameBox extends Model {
 
 		this.infoButton.addEventListener("click", () => {
 			document.body.removeChild(this.infoButton);
-			Experience.get().getCameraManager().moveToGameBox(this.viewPoint, this.infoPoint, () => this.openTheBox());
+			this.moveToBox(true);
 		});
 
 		document.body.appendChild(this.infoButton);
@@ -112,6 +112,10 @@ export class GameBox extends Model {
 		this.infoButton.style.transform = `translateX(${ translateX }px) translateY(${ translateY }px)`;
 		this.frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 		this.infoButton.style.display = (this.frustum.containsPoint(position) && position.distanceTo(camera.position) > 0) ? "block" : "none";
+	}
+
+	public async moveToBox(openTheBox: boolean = false, duration: number = 2000): Promise<void> {
+		await Experience.get().getCameraManager().moveToGameBox(this.viewPoint, this.infoPoint, () => (openTheBox) ? this.openTheBox() : null, duration);
 	}
 
 	private openTheBox(): void {
