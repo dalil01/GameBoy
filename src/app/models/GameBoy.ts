@@ -136,41 +136,75 @@ export class GameBoy extends Model {
 	}
 
 	private placeGameBoyInFrontOfCamera() {
-		// TODO
 		const gameboyPosition = this.model.position.clone();
-		const cameraDirection = new THREE.Vector3(-.8, -.6, -6);
+		const cameraDirection = new THREE.Vector3(-.72, -.47, -6);
 
-		const distanceFromCamera = .7;
+		const distanceFromCamera = .72;
 
 		cameraDirection.applyQuaternion(Experience.get().getCameraManager().getCamera().quaternion).normalize();
 
 		const projectedCameraPosition = gameboyPosition.clone().add(cameraDirection.multiplyScalar(-distanceFromCamera));
 
-		const tweenGameBoyPosition = new TWEEN.Tween(gameboyPosition)
-			.to(projectedCameraPosition, 2000)
+		new TWEEN.Tween(gameboyPosition)
+			.to(projectedCameraPosition, 1500)
 			.easing(TWEEN.Easing.Quadratic.InOut)
 			.onUpdate(() => {
 				this.model.position.copy(gameboyPosition);
-			});
+			}).onComplete(() => {
+			Experience.get().getCameraManager().switchToViewGameBoyControls();
 
-		tweenGameBoyPosition.start();
+			const bbox = new THREE.Box3().setFromObject(this.model);
+			const gameboySize = new THREE.Vector3();
+			bbox.getSize(gameboySize);
+
+			const targetRotation = new THREE.Quaternion();
+			const targetEuler = new THREE.Euler(  -1.5, 0, 0,'XYZ');
+			targetRotation.setFromEuler(targetEuler);
+
+			targetRotation.x = -1.9116387600233435;
+			targetRotation.y = -2.379999999999982;
+			targetRotation.z = -1.5299999999999963;
+
+			new TWEEN.Tween(this.model.rotation)
+				.to({
+					x: targetRotation.x,
+					y: targetRotation.y,
+					z: targetRotation.z,
+					w: targetRotation.w
+				}, 1500)
+				.easing(TWEEN.Easing.Quadratic.InOut)
+				.onComplete(() => {
+
+				let isDragging = false;
+				const previousMousePosition = { x: 0, y: 0 };
+				window.addEventListener("mousedown", (event) => {
+					isDragging = true;
+					previousMousePosition.x = event.clientX;
+					previousMousePosition.y = event.clientY;
+				});
+
+				window.addEventListener("mousemove", (event) => {
+					if (!isDragging) return;
+
+					const deltaX = event.clientX - previousMousePosition.x;
+					const deltaY = event.clientY - previousMousePosition.y;
+
+					this.model.rotation.y += deltaX * 0.005;
+					this.model.rotation.x += deltaY * 0.005;
+					this.model.rotation.z += (deltaX + deltaY) * 0.005;
+
+					// console.log(this.model.rotation)
+
+					previousMousePosition.x = event.clientX;
+					previousMousePosition.y = event.clientY;
+				});
 
 
-		const targetRotation = new THREE.Quaternion();
-		const targetEuler = new THREE.Euler(THREE.MathUtils.degToRad(100), 0, THREE.MathUtils.degToRad(100), 'XYZ');
-		targetRotation.setFromEuler(targetEuler);
-
-		const duration = 2000;
-
-		// Tween pour animer la rotation de l'objet gameboy
-		const tweenRotation = new TWEEN.Tween(this.model.rotation)
-			.to({ x: targetRotation.x, y: targetRotation.y, z: targetRotation.z, w: targetRotation.w }, duration)
-			.easing(TWEEN.Easing.Quadratic.InOut)
-			.onUpdate(() => {
-				//this.model.rotation.set(this.model.rotation.x, this.model.rotation.y, this.model.rotation.z, this.model.rotation.w);
-			});
-
-		tweenRotation.start();
+				window.addEventListener("mouseup", () => {
+					isDragging = false;
+				});
+			}).start();
+		}).start();
 	}
 
 }

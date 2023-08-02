@@ -62,10 +62,6 @@ export class Experience {
 		});
 	}
 
-	public getSizes(): Sizes {
-		return this.sizes;
-	}
-
 	public getCameraManager(): CameraManager {
 		return this.cameraManager;
 	}

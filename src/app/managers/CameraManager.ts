@@ -120,6 +120,13 @@ export class CameraManager {
 		this.autoSetMinMaxPan(minPan, maxPan)
 	}
 
+	private autoSetMinMaxPan(minPan: Vector3, maxPan: Vector3, _v: Vector3 = new Vector3()): void {
+		_v.copy(this.controls.target);
+		this.controls.target.clamp(minPan, maxPan);
+		_v.sub(this.controls.target);
+		this.camera.position.sub(_v);
+	}
+
 	private switchToViewBoxControls(): void {
 		this.controls.enableDamping = true;
 		this.controls.enablePan = false;
@@ -131,11 +138,8 @@ export class CameraManager {
 		this.controls.maxAzimuthAngle = -Math.PI / 2;
 	}
 
-	private autoSetMinMaxPan(minPan: Vector3, maxPan: Vector3, _v: Vector3 = new Vector3()): void {
-		_v.copy(this.controls.target);
-		this.controls.target.clamp(minPan, maxPan);
-		_v.sub(this.controls.target);
-		this.camera.position.sub(_v);
+	public switchToViewGameBoyControls(): void {
+		this.controls.enabled = false;
 	}
 
 }
